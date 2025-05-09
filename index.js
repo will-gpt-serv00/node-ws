@@ -189,10 +189,10 @@ const delFiles = () => {
 };
 
 httpServer.listen(PORT, () => {
-  runnz();
-  setTimeout(() => {
-    delFiles();
-  }, 30000);
+  //runnz();
+  // setTimeout(() => {
+  //   delFiles();
+  // }, 30000);
   addAccessTask();
   console.log(`Server is running on port ${PORT}`);
 });
