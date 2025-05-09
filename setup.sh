@@ -11,9 +11,8 @@ username=$(whoami)
 random_port=$((RANDOM % 40001 + 20000))  
 
 
-
-curl -s -o "/home/$username/domains/$domain/public_html/index.js" \
-    "https://raw.githubusercontent.com/frankiejun/node-ws/main/index.js"
+echo "to /home/$username/domains/$domain/public_html/index.js"
+curl -s -o "/home/$username/domains/$domain/public_html/index.js" "https://raw.githubusercontent.com/frankiejun/node-ws/main/index.js"
 
 if [ $? -ne 0 ]; then
     echo "Error: 下载脚本 index.js 失败！"
