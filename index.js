@@ -27,7 +27,7 @@ const httpServer = http.createServer((req, res) => {
     res.end('Hello, World\n');
   } else if (req.url === `/${SUB_PATH}`) {
     const vlessURL = `vless://${UUID}@www.visa.com.tw:443?encryption=none&security=tls&sni=${DOMAIN}&type=ws&host=${DOMAIN}&path=%2F#${NAME}-${ISP}`;
-    
+
     const base64Content = Buffer.from(vlessURL).toString('base64');
 
     res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -50,31 +50,31 @@ wss.on('connection', ws => {
     const port = msg.slice(i, i += 2).readUInt16BE(0);
     const ATYP = msg.slice(i, i += 1).readUInt8();
     const host = ATYP == 1 ? msg.slice(i, i += 4).join('.') :
-    (ATYP == 2 ? new TextDecoder().decode(msg.slice(i + 1, i += 1 + msg.slice(i, i + 1).readUInt8())) :
-    (ATYP == 3 ? msg.slice(i, i += 16).reduce((s, b, i, a) => (i % 2 ? s.concat(a.slice(i - 1, i + 1)) : s), []).map(b => b.readUInt16BE(0).toString(16)).join(':') : ''));
+      (ATYP == 2 ? new TextDecoder().decode(msg.slice(i + 1, i += 1 + msg.slice(i, i + 1).readUInt8())) :
+        (ATYP == 3 ? msg.slice(i, i += 16).reduce((s, b, i, a) => (i % 2 ? s.concat(a.slice(i - 1, i + 1)) : s), []).map(b => b.readUInt16BE(0).toString(16)).join(':') : ''));
     // console.log(`Connection from ${host}:${port}`);
     ws.send(new Uint8Array([VERSION, 0]));
     const duplex = createWebSocketStream(ws);
-    net.connect({ host, port }, function() {
+    net.connect({ host, port }, function () {
       this.write(msg.slice(i));
-      duplex.on('error', () => {}).pipe(this).on('error', () => {}).pipe(duplex);
-    }).on('error', () => {});
-  }).on('error', () => {});
+      duplex.on('error', () => { }).pipe(this).on('error', () => { }).pipe(duplex);
+    }).on('error', () => { });
+  }).on('error', () => { });
 });
 
 const getDownloadUrl = () => {
-  const arch = os.arch(); 
+  const arch = os.arch();
   if (arch === 'arm' || arch === 'arm64' || arch === 'aarch64') {
     if (!NEZHA_PORT) {
       return 'https://arm64.ssss.nyc.mn/v1';
     } else {
-        return 'https://arm64.ssss.nyc.mn/agent';
+      return 'https://arm64.ssss.nyc.mn/agent';
     }
   } else {
     if (!NEZHA_PORT) {
       return 'https://amd64.ssss.nyc.mn/v1';
     } else {
-        return 'https://amd64.ssss.nyc.mn/agent';
+      return 'https://amd64.ssss.nyc.mn/agent';
     }
   }
 };
@@ -95,7 +95,7 @@ const downloadFile = async () => {
     return new Promise((resolve, reject) => {
       writer.on('finish', () => {
         console.log('npm download successfully');
-        exec('chmod +x npm', (err) => {
+        exec('chmod +x ./npm', (err) => {
           if (err) reject(err);
           resolve();
         });
@@ -142,7 +142,7 @@ tls: ${nezhatls}
 use_gitee_to_upgrade: false
 use_ipv6_country_code: false
 uuid: ${UUID}`;
-      
+
       fs.writeFileSync('config.yaml', configYaml);
     }
     command = `nohup ./npm -c config.yaml >/dev/null 2>&1 &`;
@@ -152,13 +152,13 @@ uuid: ${UUID}`;
   }
 
   try {
-    exec(command, { 
+    exec(command, {
       shell: '/bin/bash'
     });
     console.log('npm is running');
   } catch (error) {
     console.error(`npm running error: ${error}`);
-  } 
+  }
 };
 
 async function addAccessTask() {
@@ -184,8 +184,8 @@ async function addAccessTask() {
 }
 
 const delFiles = () => {
-  fs.unlink('npm', () => {});
-  fs.unlink('config.yaml', () => {}); 
+  fs.unlink('npm', () => { });
+  fs.unlink('config.yaml', () => { });
 };
 
 httpServer.listen(PORT, () => {
