@@ -13,11 +13,17 @@ random_port=$((RANDOM % 40001 + 20000))
 
 echo "to /home/$username/domains/$domain/public_html/index.js"
 curl -s -o "/home/$username/domains/$domain/public_html/index.js" "https://raw.githubusercontent.com/frankiejun/node-ws/main/index.js"
-
 if [ $? -ne 0 ]; then
     echo "Error: 下载脚本 index.js 失败！"
     exit 1
 fi
+
+curl -s -o "/home/$username/cron.sh" "https://raw.githubusercontent.com/frankiejun/node-ws/main/cron.sh"
+if [ $? -ne 0 ]; then
+    echo "Error: 下载脚本 cron.sh 失败！"
+    exit 1
+fi
+
 
 
 sed -i "s/1234.abc.com/$domain/g" "/home/$username/domains/$domain/public_html/index.js"
@@ -47,12 +53,8 @@ cat > "/home/$username/domains/$domain/public_html/package.json" << EOF
 }
 EOF
 
-
-cd "/home/$username/domains/$domain/public_html/"
-
-if [ $? -ne 0 ]; then
-    echo "Error: 切换到public_html目录失败！"
-    exit 1
-fi
+echo "*/1 * * * * /home/$username/cron.sh" > ./mycron
+crontab ./mycron >/dev/null 2>&1
+rm ./mycron
 
 echo "安装完毕" 
