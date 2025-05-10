@@ -1,7 +1,7 @@
 # 安装  
 
 ```bash 
-curl -Ls https://raw.githubusercontent.com/frankiejun/node-ws/refs/heads/main/setup.sh | bash -s 你的域名  
+curl -Ls https://raw.githubusercontent.com/frankiejun/node-ws/refs/heads/main/setup.sh | bash -s yourdomain
 ```
 
 
