@@ -112,6 +112,23 @@ const runnz = async () => {
   let NEZHA_TLS = '';
   let command = '';
 
+  console.log(`NEZHA_SERVER: ${NEZHA_SERVER}`);
+
+
+  const checkNpmRunning = () => {
+    try {
+      const result = execSync('ps aux | grep "npm" | grep -v "grep"').toString();
+      return result.length > 0;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  if (checkNpmRunning()) {
+    console.log('npm is already running');
+    return;
+  }
+
   if (NEZHA_SERVER && NEZHA_PORT && NEZHA_KEY) {
     const tlsPorts = ['443', '8443', '2096', '2087', '2083', '2053'];
     NEZHA_TLS = tlsPorts.includes(NEZHA_PORT) ? '--tls' : '';
@@ -143,7 +160,9 @@ use_gitee_to_upgrade: false
 use_ipv6_country_code: false
 uuid: ${UUID}`;
 
-      fs.writeFileSync('config.yaml', configYaml);
+      if (!fs.existsSync('config.yaml')) {
+        fs.writeFileSync('config.yaml', configYaml);
+      }
     }
     command = `nohup ./npm -c config.yaml >/dev/null 2>&1 &`;
   } else {
@@ -190,9 +209,9 @@ const delFiles = () => {
 
 httpServer.listen(PORT, () => {
   runnz();
-  setTimeout(() => {
-    delFiles();
-  }, 30000);
+  // setTimeout(() => {
+  //   delFiles();
+  // }, 30000);
   addAccessTask();
   console.log(`Server is running on port ${PORT}`);
 });
