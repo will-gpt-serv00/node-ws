@@ -6,7 +6,7 @@
 curl -Ls https://raw.githubusercontent.com/frankiejun/node-ws/refs/heads/main/setup.sh > setup.sh && chmod +x setup.sh && ./setup.sh yourdomain
 ```
 
-> 目前只能手动上传 index.js,package.json 然后面板启动！  
+> webhostmost目前只能手动上传 index.js, package.json, cron.sh 然后面板启动！  
 
 
 
