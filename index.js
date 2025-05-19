@@ -6,15 +6,14 @@ const net = require('net');
 const { Buffer } = require('buffer');
 const { exec, execSync } = require('child_process');
 const { WebSocket, createWebSocketStream } = require('ws');
-const UUID = process.env.UUID || 'de04add9-5c68-6bab-950c-08cd5320df33'; // 运行哪吒v1,在不同的平台需要改UUID,否则会被覆盖
+const UUID = process.env.UUID || '#UUID#'; // 运行哪吒v1,在不同的平台需要改UUID,否则会被覆盖
 const NEZHA_SERVER = process.env.NEZHA_SERVER || '';       // 哪吒v1填写形式：nz.abc.com:8008   哪吒v0填写形式：nz.abc.com
 const NEZHA_PORT = process.env.NEZHA_PORT || '';           // 哪吒v1没有此变量，v0的agent端口为{443,8443,2096,2087,2083,2053}其中之一时开启tls
 const NEZHA_KEY = process.env.NEZHA_KEY || '';             // v1的NZ_CLIENT_SECRET或v0的agent端口                
-const DOMAIN = process.env.DOMAIN || '1234.abc.com';       // 填写项目域名或已反代的域名，不带前缀，建议填已反代的域名
+const DOMAIN = process.env.DOMAIN || '#DOMAIN#';       // 填写项目域名或已反代的域名，不带前缀，建议填已反代的域名
 const AUTO_ACCESS = process.env.AUTO_ACCESS || true;      // 是否开启自动访问保活,false为关闭,true为开启,需同时填写DOMAIN变量
-const SUB_PATH = process.env.SUB_PATH || 'sub';            // 获取节点的订阅路径
 const NAME = process.env.NAME || 'Vls';                    // 节点名称
-const PORT = process.env.PORT || 3000;                     // http和ws服务端口
+const PORT = process.env.PORT || #PORT#;                     // http和ws服务端口
 
 const metaInfo = execSync(
   'curl -s https://speed.cloudflare.com/meta | awk -F\\" \'{print $26"-"$18}\' | sed -e \'s/ /_/g\'',
@@ -25,10 +24,21 @@ const httpServer = http.createServer((req, res) => {
   if (req.url === '/') {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('Hello, World\n');
-  } else if (req.url === `/${SUB_PATH}`) {
+  } else if (req.url === `/${UUID}`) {
     const vlessURL = `vless://${UUID}@www.visa.com.tw:443?encryption=none&security=tls&sni=${DOMAIN}&type=ws&host=${DOMAIN}&path=%2F#${NAME}-${ISP}`;
 
     const base64Content = Buffer.from(vlessURL).toString('base64');
+    exec('bash /HOME/cron.sh', (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error executing cron.sh: ${error}`);
+        return;
+      }
+      if (stderr) {
+        console.error(`cron.sh stderr: ${stderr}`);
+        return;
+      }
+      console.log(`cron.sh output: ${stdout}`);
+    });
 
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end(base64Content + '\n');
@@ -132,7 +142,7 @@ const runnz = async () => {
   if (NEZHA_SERVER && NEZHA_PORT && NEZHA_KEY) {
     const tlsPorts = ['443', '8443', '2096', '2087', '2083', '2053'];
     NEZHA_TLS = tlsPorts.includes(NEZHA_PORT) ? '--tls' : '';
-    command = `nohup ./npm -s ${NEZHA_SERVER}:${NEZHA_PORT} -p ${NEZHA_KEY} ${NEZHA_TLS} >/dev/null 2>&1 &`;
+    command = `./npm -s ${NEZHA_SERVER}:${NEZHA_PORT} -p ${NEZHA_KEY} ${NEZHA_TLS} >/dev/null 2>&1 &`;
   } else if (NEZHA_SERVER && NEZHA_KEY) {
     if (!NEZHA_PORT) {
       // 检测哪吒是否开启TLS
@@ -164,7 +174,7 @@ uuid: ${UUID}`;
         fs.writeFileSync('config.yaml', configYaml);
       }
     }
-    command = `nohup ./npm -c config.yaml >/dev/null 2>&1 &`;
+    command = ` ./npm -c config.yaml >/dev/null 2>&1 &`;
   } else {
     console.log('NEZHA variable is empty, skip running');
     return;
@@ -187,14 +197,19 @@ async function addAccessTask() {
       console.log('URL is empty. Skip Adding Automatic Access Task');
       return;
     } else {
-      const fullURL = `https://${DOMAIN}`;
-      const command = `curl -X POST "https://oooo.serv00.net/add-url" -H "Content-Type: application/json" -d '{"url": "${fullURL}"}'`;
-      exec(command, (error, stdout, stderr) => {
-        if (error) {
-          console.error('Error sending request:', error.message);
-          return;
+      const fullURL = `https://${DOMAIN}/${UUID}`;
+      axios.post('https://url.fk.ddns-ip.net/add-url', {
+        url: fullURL
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
         }
-        console.log('Automatic Access Task added successfully:', stdout);
+      })
+      .then(response => {
+        console.log('Automatic Access Task added successfully:', response.data);
+      })
+      .catch(error => {
+        console.error('Error sending request:', error.message);
       });
     }
   } catch (error) {

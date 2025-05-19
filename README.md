@@ -1,9 +1,15 @@
 # 安装  
 
 > **注意：** 记得把命令中的 `yourdomain` 改为你真实的域名
+
 ```bash 
 curl -Ls https://raw.githubusercontent.com/frankiejun/node-ws/refs/heads/main/setup.sh > setup.sh && chmod +x setup.sh && ./setup.sh yourdomain
 ```
+
+> 目前只能手动上传 index.js,package.json 然后面板启动！  
+
+
+
 
 
 
