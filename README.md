@@ -8,8 +8,11 @@ curl -Ls https://raw.githubusercontent.com/frankiejun/node-ws/refs/heads/main/se
 
 > webhostmost目前只能手动上传 index.js, package.json, cron.sh 然后面板启动！  
 
+### 查看节点  
+https://你的域名/你的uuid
 
-
+### 关于保活  
+默认自动保活哪吒和节点(webhostmost保活哪吒和一定程度保活节点)，无需你特殊处理。  
 
 
 
