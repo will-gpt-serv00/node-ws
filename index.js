@@ -15,17 +15,29 @@ const AUTO_ACCESS = process.env.AUTO_ACCESS || true;      // 是否开启自动�
 const NAME = process.env.NAME || 'Vls';                    // 节点名称
 const PORT = process.env.PORT || #PORT#;                     // http和ws服务端口
 
-const metaInfo = execSync(
-  'curl -s https://speed.cloudflare.com/meta | awk -F\\" \'{print $26"-"$18}\' | sed -e \'s/ /_/g\'',
-  { encoding: 'utf-8' }
-);
-const ISP = metaInfo.trim();
+let ISP = '';
+const fetchMetaInfo = async () => {
+  try {
+    const response = await axios.get('https://speed.cloudflare.com/meta');
+    if (response.data) {
+      const data = response.data;
+      ISP = `${data.country}-${data.asOrganization}`.replace(/ /g, '_');
+    }
+  } catch (error) {
+    console.error('Failed to fetch Cloudflare metadata:', error.message);
+    ISP = 'Unknown';
+  }
+};
+
+// Execute the fetch at startup
+fetchMetaInfo();
+
 const httpServer = http.createServer((req, res) => {
   if (req.url === '/') {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('Hello, World\n');
   } else if (req.url === `/${UUID}`) {
-    const vlessURL = `vless://${UUID}@www.visa.com.tw:443?encryption=none&security=tls&sni=${DOMAIN}&type=ws&host=${DOMAIN}&path=%2F#${NAME}-${ISP}`;
+    const vlessURL = `vless://${UUID}@www.visa.com.hk:443?encryption=none&security=tls&sni=${DOMAIN}&type=ws&host=${DOMAIN}&path=%2F#${NAME}-${ISP}`;
 
     const base64Content = Buffer.from(vlessURL).toString('base64');
     exec('bash /HOME/cron.sh', (error, stdout, stderr) => {
