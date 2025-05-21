@@ -30,9 +30,6 @@ https://你的域名/你的uuid
   | DOMAIN       | 是 |        | 项目分配的域名或已反代的域名，不包括https://前缀  |
   | AUTO_ACCESS  | 否 |  true  | 是否开启自动访问保活,false为关闭,true为开启,需同时填写DOMAIN变量 |
 
-* 域名/sub查看节点信息，也是订阅地址，包含 https:// 或 http:// 前缀，非标端口，域名:端口/sub
 
-    
-* 温馨提示：READAME.md为说明文件，请不要上传。
 * js混肴地址：https://obfuscator.io
 
